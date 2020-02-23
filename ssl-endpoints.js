@@ -14,7 +14,7 @@ router.post('/ssl/create-session/:orderId', (req, res) => {
             var options = {
                 method: 'POST',
                 url: 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php',
-                body: {
+                form: { // all parameters should be as URL encoded form-data
                     store_id: 'shaja5df87f7bb42aa',
                     store_passwd: 'shaja5df87f7bb42aa@ssl',
                     total_amount: (data.price - data.discount),
@@ -52,10 +52,11 @@ router.post('/ssl/create-session/:orderId', (req, res) => {
 
 
                 },
-                json: true
+                // Not json
+                // json: true 
             };
 
-            let test = new SSLCommerzPayment(options.body, false);
+            let test = new SSLCommerzPayment(options.form, false);
             test.then((data) => {
                 res.status(Constant.SUCCESS_STATUS).json({
                     status: 'success',
@@ -91,12 +92,18 @@ router.post('/ssl/ipn', (req, res) => {
 
     const store_id = encodeURI('shaja5df87f7bb42aa');
     const store_passwd = encodeURI('shaja5df87f7bb42aa@ssl');
-    const requested_url = ("https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id=" + val_id + "&store_id=" + store_id + "&store_passwd=" + store_passwd + "&v=1&format=json");
+    const requested_url = ("https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php");
 
     var options = {
         method: 'GET',
         url: requested_url,
-        json: true
+        qs: {
+            val_id: val_id,
+            store_id: store_id,
+            store_passwd: store_passwd,
+            v: 1,
+            format: 'json' // This indicates the response format, request parameters will be simple query strings
+        }
     };
 
     request(options, function (error, response, body) {
